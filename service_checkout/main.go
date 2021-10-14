@@ -5,9 +5,10 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"log"
-	"microservices_demo_v1/service_ad/internal/server"
-	"microservices_demo_v1/service_ad/internal/service"
+	"microservices_demo_v1/service_checkout/internal/biz"
+	"microservices_demo_v1/service_checkout/internal/server"
+	"microservices_demo_v1/service_checkout/internal/service"
+
 	"net"
 	"os"
 	"os/signal"
@@ -15,25 +16,29 @@ import (
 )
 
 var logger *zap.Logger
+
 func init() {
 	logger = zap.NewExample()
 }
 func main() {
 	var grpcServer *grpc.Server
 
-	productService := service.NewAdService(logger)
+	useCase := biz.NewCheckoutUseCase(logger)
+	productService := service.NewCheckoutService(useCase, logger)
 
 	go func() {
-		addr := "0.0.0.0:" + fmt.Sprint(9001)
+		addr := "0.0.0.0:" + fmt.Sprint(9003)
 		grpcServer = server.NewGRPCServer(logger, productService)
 		lis, err := net.Listen("tcp", addr)
 		if err != nil {
-			log.Fatalf("port is used : %v", err)
+			logger.Error("port is used : ", zap.Error(err))
+			return
 		}
 		fmt.Println("started grpc server" + addr)
 		reflection.Register(grpcServer)
 		if err := grpcServer.Serve(lis); err != nil {
-			log.Fatalf("start grpc failed :%v", err)
+			logger.Error("start grpc failed :%v", zap.Error(err))
+			return
 		}
 
 	}()
@@ -44,5 +49,4 @@ func main() {
 
 	fmt.Println("deregister service")
 	grpcServer.GracefulStop()
-
 }

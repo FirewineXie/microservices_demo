@@ -9,7 +9,7 @@ type Ad struct {
 
 
 
-
+//
 var adsMap map[string][]Ad
 
 func init() {

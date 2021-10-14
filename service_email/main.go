@@ -26,7 +26,7 @@ func main() {
 	productService := service.NewEmailService(emailUseCase, logger)
 
 	go func() {
-		addr := "0.0.0.0:" + fmt.Sprint(9001)
+		addr := "0.0.0.0:" + fmt.Sprint(9005)
 		grpcServer = server.NewGRPCServer(logger, productService)
 		lis, err := net.Listen("tcp", addr)
 		if err != nil {
