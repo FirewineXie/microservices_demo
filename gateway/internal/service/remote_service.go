@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
-	v1 "microservices_demo_v1/gateway/api/v1"
+	v1 "microservices_demo/gateway/api/v1"
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
@@ -29,13 +29,16 @@ func getProduct(ctx context.Context, id string) (*v1.Product, error) {
 		return nil, err
 	}
 	defer conn.Close()
-	resp, err := v1.NewProductCatalogServiceClient(conn).GetProduct(ctx, &v1.GetProductRequest{
+	resp, err := v1.NewProductCatalogServiceClient(conn).GetProduct(context.Background(), &v1.GetProductRequest{
 		Id: id,
 	})
+
 	if err != nil {
 		return nil, err
 	}
+
 	return resp, nil
+
 }
 
 func getCurrencies(ctx context.Context) (*v1.GetSupportedCurrenciesResponse, error) {
@@ -199,4 +202,19 @@ func getProducts(ctx context.Context) ([]*v1.Product, error) {
 		return nil, err
 	}
 	return resp.Products, nil
+}
+func sendOrderConfirmation(ctx context.Context, email string, order *v1.OrderResult) error {
+
+
+	conn, err := grpc.DialContext(ctx,
+		"0.0.0.0:9005", grpc.WithInsecure(),
+		grpc.WithUnaryInterceptor(grpc_opentracing.UnaryClientInterceptor()))
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	_, err = v1.NewEmailServiceClient(conn).SendOrderConfirmation(ctx, &v1.SendOrderConfirmationRequest{
+		Email: email,
+		Order: order})
+	return err
 }

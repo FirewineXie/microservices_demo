@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	v1 "microservices_demo_v1/service_payment/api/v1"
+	v1 "microservices_demo/service_payment/api/v1"
 )
 
 func (ps *PaymentService) Charge(ctx context.Context, request *v1.ChargeRequest) (*v1.ChargeResponse, error) {

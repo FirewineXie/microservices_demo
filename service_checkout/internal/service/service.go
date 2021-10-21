@@ -2,8 +2,8 @@ package service
 
 import (
 	"go.uber.org/zap"
-	v1 "microservices_demo_v1/service_checkout/api/v1"
-	"microservices_demo_v1/service_checkout/internal/biz"
+	v1 "microservices_demo/service_checkout/api/v1"
+	"microservices_demo/service_checkout/internal/biz"
 )
 
 type CheckoutService struct {

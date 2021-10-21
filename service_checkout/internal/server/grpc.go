@@ -9,8 +9,8 @@ import (
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	v1 "microservices_demo_v1/service_checkout/api/v1"
-	service2 "microservices_demo_v1/service_checkout/internal/service"
+	v1 "microservices_demo/service_checkout/api/v1"
+	service2 "microservices_demo/service_checkout/internal/service"
 
 )
 

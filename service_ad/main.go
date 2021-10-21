@@ -6,8 +6,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log"
-	"microservices_demo_v1/service_ad/internal/server"
-	"microservices_demo_v1/service_ad/internal/service"
+	"microservices_demo/service_ad/internal/pkg"
+	"microservices_demo/service_ad/internal/server"
+	"microservices_demo/service_ad/internal/service"
 	"net"
 	"os"
 	"os/signal"
@@ -15,6 +16,7 @@ import (
 )
 
 var logger *zap.Logger
+
 func init() {
 	logger = zap.NewExample()
 }
@@ -22,7 +24,11 @@ func main() {
 	var grpcServer *grpc.Server
 
 	productService := service.NewAdService(logger)
-
+	pkg.ConnectNacos()
+	_, err := pkg.RegisterInstance()
+	if err != nil {
+		panic(err)
+	}
 	go func() {
 		addr := "0.0.0.0:" + fmt.Sprint(9001)
 		grpcServer = server.NewGRPCServer(logger, productService)
@@ -41,7 +47,7 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-
+	pkg.DeregisterInstance()
 	fmt.Println("deregister service")
 	grpcServer.GracefulStop()
 

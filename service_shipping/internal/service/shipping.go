@@ -2,9 +2,9 @@ package service
 
 import (
 	"go.uber.org/zap"
-	v1 "microservices_demo_v1/service_shipping/api/v1"
+	v1 "microservices_demo/service_shipping/api/v1"
 
-	"microservices_demo_v1/service_shipping/internal/biz"
+	"microservices_demo/service_shipping/internal/biz"
 )
 
 type ShippingService struct {

@@ -9,9 +9,9 @@ import (
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	v1 "microservices_demo_v1/service_email/api/v1"
+	v1 "microservices_demo/service_email/api/v1"
 
-	"microservices_demo_v1/service_email/internal/service"
+	"microservices_demo/service_email/internal/service"
 )
 
 // NewGRPCServer new a gRPC server.

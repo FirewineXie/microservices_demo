@@ -2,8 +2,8 @@ package service
 
 import (
 	"go.uber.org/zap"
-	v1 "microservices_demo_v1/service_cart/api/v1"
-	"microservices_demo_v1/service_cart/internal/biz"
+	v1 "microservices_demo/service_cart/api/v1"
+	"microservices_demo/service_cart/internal/biz"
 )
 
 type CartService struct {

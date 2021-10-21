@@ -4,7 +4,7 @@ package money
 
 import (
 	"errors"
-	v1 "microservices_demo_v1/gateway/api/v1"
+	v1 "microservices_demo/gateway/api/v1"
 )
 
 const (

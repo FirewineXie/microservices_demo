@@ -5,9 +5,12 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"microservices_demo_v1/service_checkout/internal/biz"
-	"microservices_demo_v1/service_checkout/internal/server"
-	"microservices_demo_v1/service_checkout/internal/service"
+	"io"
+	"microservices_demo/service_checkout/internal/biz"
+	"microservices_demo/service_checkout/internal/pkg"
+	"microservices_demo/service_checkout/internal/server"
+	"microservices_demo/service_checkout/internal/service"
+	"microservices_demo/third_party/jaegerc"
 
 	"net"
 	"os"
@@ -22,10 +25,15 @@ func init() {
 }
 func main() {
 	var grpcServer *grpc.Server
-
+	tracer := startTracer()
+	defer tracer.Close()
 	useCase := biz.NewCheckoutUseCase(logger)
 	productService := service.NewCheckoutService(useCase, logger)
-
+	pkg.ConnectNacos()
+	_, err := pkg.RegisterInstance()
+	if err != nil {
+		panic(err)
+	}
 	go func() {
 		addr := "0.0.0.0:" + fmt.Sprint(9003)
 		grpcServer = server.NewGRPCServer(logger, productService)
@@ -46,7 +54,19 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-
+	pkg.DeregisterInstance()
 	fmt.Println("deregister service")
 	grpcServer.GracefulStop()
+}
+
+func startTracer() io.Closer {
+	closer, err := jaegerc.InitGlobalTracerProd(&jaegerc.TraceConf{
+
+		ServerName: "service_checkout",
+	}, logger)
+	if err != nil {
+		panic("Could not initialize jaeger tracer: %s" + err.Error())
+
+	}
+	return closer
 }

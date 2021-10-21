@@ -4,7 +4,7 @@ import (
 	"context"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"google.golang.org/grpc"
-	v1 "microservices_demo_v1/service_product_catalog/api/v1"
+	v1 "microservices_demo/service_product_catalog/api/v1"
 
 	"testing"
 )

@@ -3,8 +3,8 @@ package service
 import (
 	"go.uber.org/zap"
 	"math/rand"
-	v1 "microservices_demo_v1/service_ad/api/v1"
-	"microservices_demo_v1/service_ad/internal/biz"
+	v1 "microservices_demo/service_ad/api/v1"
+	"microservices_demo/service_ad/internal/biz"
 )
 
 type AdService struct {

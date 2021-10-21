@@ -5,9 +5,9 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"microservices_demo_v1/service_recommendation/internal/biz"
-	"microservices_demo_v1/service_recommendation/internal/server"
-	"microservices_demo_v1/service_recommendation/internal/service"
+	"microservices_demo/service_recommendation/internal/biz"
+	"microservices_demo/service_recommendation/internal/server"
+	"microservices_demo/service_recommendation/internal/service"
 
 	"net"
 	"os"

@@ -12,6 +12,8 @@ func NewHTTPServer(logger *zap.Logger, handler *gin.Engine, addr string, timeout
 		Handler:      handler,
 		Addr:         addr,
 		WriteTimeout: timeout,
+		ReadTimeout:    10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
 	}
 
 	return server

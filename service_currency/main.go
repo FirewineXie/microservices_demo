@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 	"go.uber.org/zap"
-	"microservices_demo_v1/service_currency/internal/service"
+	"microservices_demo/service_currency/internal/service"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"microservices_demo_v1/service_currency/internal/biz"
-	"microservices_demo_v1/service_currency/internal/server"
+	"microservices_demo/service_currency/internal/biz"
+	"microservices_demo/service_currency/internal/server"
 
 	"net"
 	"os"

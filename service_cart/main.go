@@ -5,9 +5,10 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"microservices_demo_v1/service_cart/internal/biz"
-	"microservices_demo_v1/service_cart/internal/server"
-	"microservices_demo_v1/service_cart/internal/service"
+	"microservices_demo/service_cart/internal/biz"
+	"microservices_demo/service_cart/internal/pkg"
+	"microservices_demo/service_cart/internal/server"
+	"microservices_demo/service_cart/internal/service"
 	"net"
 	"os"
 	"os/signal"
@@ -23,7 +24,11 @@ func init() {
 
 func main() {
 	var grpcServer *grpc.Server
-
+	pkg.ConnectNacos()
+	_, err := pkg.RegisterInstance()
+	if err != nil {
+		panic(err)
+	}
 	useCase := biz.NewCartUseCase(logger)
 	productService := service.NewCartService(useCase, logger)
 
@@ -47,7 +52,7 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-
+	pkg.DeregisterInstance()
 	fmt.Println("deregister service")
 	grpcServer.GracefulStop()
 }

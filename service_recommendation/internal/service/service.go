@@ -2,8 +2,8 @@ package service
 
 import (
 	"go.uber.org/zap"
-	v1 "microservices_demo_v1/service_recommendation/api/v1"
-	"microservices_demo_v1/service_recommendation/internal/biz"
+	v1 "microservices_demo/service_recommendation/api/v1"
+	"microservices_demo/service_recommendation/internal/biz"
 )
 
 type RecommendationService struct {

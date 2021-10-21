@@ -6,7 +6,7 @@ import (
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
-	v1 "microservices_demo_v1/service_checkout/api/v1"
+	v1 "microservices_demo/service_checkout/api/v1"
 )
 
 func getUserCart(ctx context.Context, userID string) ([]*v1.CartItem, error) {

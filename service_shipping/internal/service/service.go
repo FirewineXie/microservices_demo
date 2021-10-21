@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/prometheus/common/log"
-	v1 "microservices_demo_v1/service_shipping/api/v1"
+	v1 "microservices_demo/service_shipping/api/v1"
 )
 
 func (ss *ShippingService) GetQuote(c context.Context, request *v1.GetQuoteRequest) (*v1.GetQuoteResponse, error) {

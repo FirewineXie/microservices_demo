@@ -4,7 +4,7 @@ import (
 	"context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	v1 "microservices_demo_v1/service_product_catalog/api/v1"
+	v1 "microservices_demo/service_product_catalog/api/v1"
 	"strings"
 )
 

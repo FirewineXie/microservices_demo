@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 	"math"
-	v1 "microservices_demo_v1/service_currency/api/v1"
-	"microservices_demo_v1/service_currency/internal/biz"
+	v1 "microservices_demo/service_currency/api/v1"
+	"microservices_demo/service_currency/internal/biz"
 )
 
 // GetSupportedCurrencies Lists the supported currencies

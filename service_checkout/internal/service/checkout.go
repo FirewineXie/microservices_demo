@@ -5,61 +5,58 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	v1 "microservices_demo_v1/service_checkout/api/v1"
-	"microservices_demo_v1/service_checkout/internal/biz"
+	v1 "microservices_demo/service_checkout/api/v1"
 )
 
 func (cs  *CheckoutService) PlaceOrder(ctx context.Context,request *v1.PlaceOrderRequest) (resp *v1.PlaceOrderResponse,err error) {
 
 	orderID, err := uuid.NewUUID()
-
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to generate order uuid")
-	}
-
-	prep, err := cs.prepareOrderItemsAndShippingQuoteFromCart(ctx, request.UserId, request.UserCurrency, request.Address)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, err.Error())
-	}
-	total := biz.Money{
-		CurrencyCode: request.UserCurrency,
-		Units:        0,
-		Nanos:        0}
-
-	total = biz.Must(biz.Sum(total, biz.Money{}))
-	for _, it := range prep.orderItems {
-		total = biz.Must(biz.Sum(total, biz.Money{
-			it.Cost.CurrencyCode,
-			it.Cost.Units,
-			it.Cost.Nanos,
-		}))
-	}
-
-	txID, err := chargeCard(ctx, &v1.Money{
-		Nanos: total.Nanos,
-		CurrencyCode: total.CurrencyCode,
-		Units: total.Units,
-	}, request.CreditCard)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to charge card: %+v", err)
-	}
-
-	cs.logger.Info("payment went through ", zap.String("transaction_id", txID))
-	shippingTrackingID, err := shipOrder(ctx, request.Address, prep.cartItems)
-	if err != nil {
-		return nil, status.Errorf(codes.Unavailable, "shipping error: %+v", err)
-	}
-
-	_ = emptyUserCart(ctx, request.UserId)
-
+	//
+	//if err != nil {
+	//	return nil, status.Errorf(codes.Internal, "failed to generate order uuid")
+	//}
+	//
+	//prep, err := cs.prepareOrderItemsAndShippingQuoteFromCart(ctx, request.UserId, request.UserCurrency, request.Address)
+	//if err != nil {
+	//	return nil, status.Errorf(codes.Internal, err.Error())
+	//}
+	//total := biz.Money{
+	//	CurrencyCode: request.UserCurrency,
+	//	Units:        0,
+	//	Nanos:        0}
+	//
+	//total = biz.Must(biz.Sum(total, biz.Money{}))
+	//for _, it := range prep.orderItems {
+	//	total = biz.Must(biz.Sum(total, biz.Money{
+	//		it.Cost.CurrencyCode,
+	//		it.Cost.Units,
+	//		it.Cost.Nanos,
+	//	}))
+	//}
+	//
+	//txID, err := chargeCard(ctx, &v1.Money{
+	//	Nanos: total.Nanos,
+	//	CurrencyCode: total.CurrencyCode,
+	//	Units: total.Units,
+	//}, request.CreditCard)
+	//if err != nil {
+	//	return nil, status.Errorf(codes.Internal, "failed to charge card: %+v", err)
+	//}
+	//
+	//cs.logger.Info("payment went through ", zap.String("transaction_id", txID))
+	//shippingTrackingID, err := shipOrder(ctx, request.Address, prep.cartItems)
+	//if err != nil {
+	//	return nil, status.Errorf(codes.Unavailable, "shipping error: %+v", err)
+	//}
+	//
+	//_ = emptyUserCart(ctx, request.UserId)
+	//
 	orderResult := &v1.OrderResult{
 		OrderId:            orderID.String(),
-		ShippingTrackingId: shippingTrackingID,
-		ShippingCost:       prep.shippingCostLocalized,
+		//ShippingTrackingId: shippingTrackingID,
+		//ShippingCost:       prep.shippingCostLocalized,
 		ShippingAddress:    request.Address,
-		Items:              prep.orderItems,
+		//Items:              prep.orderItems,
 	}
 
 	if err := sendOrderConfirmation(ctx, request.Email, orderResult); err != nil {

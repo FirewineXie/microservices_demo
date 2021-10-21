@@ -2,10 +2,9 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	v1 "microservices_demo_v1/service_email/api/v1"
+	v1 "microservices_demo/service_email/api/v1"
 )
 
 func (f *EmailService) SendOrderConfirmation(ctx context.Context,
@@ -15,7 +14,7 @@ func (f *EmailService) SendOrderConfirmation(ctx context.Context,
 	order := request.GetOrder()
 
 	// 这里相当于生成确认信息
-	fmt.Printf("send email to %v of content is %v", email, order.String())
+	f.logger.Sugar().Infof("send email to %v of content is %v", email, order.String())
 
 	if err = f.email.SendOrderResultByEmail(ctx, email, order.String()); err != nil {
 		return &result, status.Errorf(codes.Internal, "don't send")

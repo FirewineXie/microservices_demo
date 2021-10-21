@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
-	v1 "microservices_demo_v1/service_ad/api/v1"
-	"microservices_demo_v1/service_ad/internal/biz"
+	v1 "microservices_demo/service_ad/api/v1"
+	"microservices_demo/service_ad/internal/biz"
 )
 
 func (s *AdService) GetAds(ctx context.Context,
