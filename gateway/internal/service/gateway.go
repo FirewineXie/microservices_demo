@@ -94,12 +94,13 @@ func ProductHandler(c *gin.Context) {
 		})
 		return
 	}
-	ctx, cancelFunc := context.WithTimeout(c.Request.Context(), time.Duration(time.Minute))
-	defer cancelFunc()
-
-	//sendOrderConfirmation(ctx, "dddd", nil)
-	fmt.Println(ctx)
-	////conn, err := creatConn(ctx, "0.0.0.0:9005")
+	//ctx, cancelFunc := context.WithTimeout(c.Request.Context(), time.Duration(time.Minute))
+	//defer cancelFunc()
+	//
+	////product, err := getProduct(ctx, "OLJCESPC7Z")
+	//fmt.Println(err)
+	//fmt.Println(product)
+	//////conn, err := creatConn(ctx, "0.0.0.0:9005")
 	////if err != nil {
 	////	c.AbortWithStatusJSON(http.StatusOK, map[string]interface{}{
 	////		//"msg": errors.Wrap(err, "could not retrieve product").Error(),
@@ -175,18 +176,18 @@ func ProductHandler(c *gin.Context) {
 	//	Item  *v1.Product
 	//	Price *v1.Money
 	//}{p, price}
-
-	c.JSON(http.StatusOK, map[string]interface{}{
-		//"session_id":      sessionID(c.Request),
-		//"request_id":      c.Request.Context().Value(ctxKeyRequestID{}),
-		//"ad":              chooseAd(c.Request.Context(), p.Categories),
-		//"user_currency":   currentCurrency(c.Request),
-		"show_currency": true,
-		//"currencies":      currencies,
-		//"product":         product,
-		//"recommendations": recommendations,
-		//"cart_size":       cartSize(cart),
-	})
+	fmt.Println("success ? ")
+	//c.JSON(http.StatusOK, map[string]interface{}{
+	//	//"session_id":      sessionID(c.Request),
+	//	//"request_id":      c.Request.Context().Value(ctxKeyRequestID{}),
+	//	//"ad":              chooseAd(c.Request.Context(), p.Categories),
+	//	//"user_currency":   currentCurrency(c.Request),
+	//	"show_currency": true,
+	//	//"currencies":      currencies,
+	//	//"product":         product,
+	//	//"recommendations": recommendations,
+	//	//"cart_size":       cartSize(cart),
+	//})
 
 }
 

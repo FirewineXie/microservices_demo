@@ -89,7 +89,10 @@ func GinLogger() gin.HandlerFunc {
 		blw := &CustomResponseWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
 		c.Writer = blw
 		c.Next()
-		fmt.Sprintf("url=%s, status=%d, resp=%s", c.Request.URL, c.Writer.Status(), blw.body.String())
+		fmt.Println(c.Writer.Status())
+		fmt.Println(c.Writer.Write([]byte("44234")))
+		fmt.Println(c.Writer.WriteString("4543534"))
+		fmt.Printf("url=%s, status=%d, resp=%s \n", c.Request.URL, c.Writer.Status(), blw.body.String())
 	}
 }
 type CustomResponseWriter struct {

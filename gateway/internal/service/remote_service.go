@@ -213,7 +213,9 @@ func sendOrderConfirmation(ctx context.Context, email string, order *v1.OrderRes
 		return err
 	}
 	defer conn.Close()
-	_, err = v1.NewEmailServiceClient(conn).SendOrderConfirmation(ctx, &v1.SendOrderConfirmationRequest{
+
+	_, err = v1.NewEmailServiceClient(conn).
+		SendOrderConfirmation(ctx, &v1.SendOrderConfirmationRequest{
 		Email: email,
 		Order: order})
 	return err

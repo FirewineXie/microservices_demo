@@ -7,7 +7,6 @@ import (
 	"google.golang.org/grpc/reflection"
 	"io"
 	"microservices_demo/service_email/internal/biz"
-	"microservices_demo/service_email/internal/pkg"
 	"microservices_demo/service_email/internal/server"
 	"microservices_demo/service_email/internal/service"
 	"microservices_demo/third_party/jaegerc"
@@ -24,15 +23,15 @@ func init() {
 }
 func main() {
 	var grpcServer *grpc.Server
-	tracer := startTracer()
-	defer tracer.Close()
+	//tracer := startTracer()
+	//defer tracer.Close()
 	emailUseCase := biz.NewEmailUseCase(logger)
 	productService := service.NewEmailService(emailUseCase, logger)
-	pkg.ConnectNacos()
-	_, err := pkg.RegisterInstance()
-	if err != nil {
-		panic(err)
-	}
+	//pkg.ConnectNacos()
+	//_, err := pkg.RegisterInstance()
+	//if err != nil {
+	//	panic(err)
+	//}
 	go func() {
 		addr := "0.0.0.0:" + fmt.Sprint(9005)
 		grpcServer = server.NewGRPCServer(logger, productService)
@@ -53,7 +52,7 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	pkg.DeregisterInstance()
+	//pkg.DeregisterInstance()
 	fmt.Println("deregister service")
 	grpcServer.GracefulStop()
 }

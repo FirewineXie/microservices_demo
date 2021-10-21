@@ -6,7 +6,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"microservices_demo/service_product_catalog/internal/biz"
-	"microservices_demo/service_product_catalog/internal/pkg"
 	"microservices_demo/service_product_catalog/internal/server"
 	"microservices_demo/service_product_catalog/internal/service"
 
@@ -26,11 +25,11 @@ func main() {
 
 	useCase := biz.NewProductCatalogUseCase(logger)
 	productService := service.NewProductCatalogService(useCase, logger)
-	pkg.ConnectNacos()
-	_, err := pkg.RegisterInstance()
-	if err != nil {
-		panic(err)
-	}
+	//pkg.ConnectNacos()
+	//_, err := pkg.RegisterInstance()
+	//if err != nil {
+	//	panic(err)
+	//}
 	go func() {
 		addr := "0.0.0.0:" + fmt.Sprint(9007)
 		grpcServer = server.NewGRPCServer(logger, productService)
@@ -51,7 +50,7 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	pkg.DeregisterInstance()
+	//pkg.DeregisterInstance()
 	fmt.Println("deregister service")
 	grpcServer.GracefulStop()
 }
