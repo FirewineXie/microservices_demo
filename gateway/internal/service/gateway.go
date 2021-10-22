@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"github.com/pkg/errors"
@@ -28,7 +27,19 @@ const (
 	cookieCurrency  = cookiePrefix + "currency"
 )
 
-func HomeHandlerGet(ctx *gin.Context) {
+func (gs *GatewayService) Router(ctx *gin.RouterGroup) {
+
+	ctx.GET("/product/:id", gs.ProductHandler)
+	ctx.GET("/cart", gs.ViewCartHandler)
+	ctx.POST("/cart", gs.AddToCartHandler)
+	ctx.POST("/cart/empty", gs.EmptyCartHandler)
+	ctx.POST("/setCurrency", gs.SetCurrencyHandler)
+	ctx.GET("/logout", gs.LogoutHandler)
+	ctx.POST("/cart/checkout", gs.PlaceOrderHandler)
+
+}
+
+func (gs *GatewayService) HomeHandlerGet(ctx *gin.Context) {
 	spanV, exists := ctx.Get("ctx")
 	if !exists {
 		ctx.JSON(http.StatusInternalServerError, map[string]interface{}{
@@ -85,7 +96,7 @@ func HomeHandlerGet(ctx *gin.Context) {
 	})
 }
 
-func ProductHandler(c *gin.Context) {
+func (gs *GatewayService) ProductHandler(c *gin.Context) {
 	id := c.Param("id")
 	if id == "" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -94,104 +105,69 @@ func ProductHandler(c *gin.Context) {
 		})
 		return
 	}
-	//ctx, cancelFunc := context.WithTimeout(c.Request.Context(), time.Duration(time.Minute))
-	//defer cancelFunc()
-	//
-	////product, err := getProduct(ctx, "OLJCESPC7Z")
-	//fmt.Println(err)
-	//fmt.Println(product)
-	//////conn, err := creatConn(ctx, "0.0.0.0:9005")
-	////if err != nil {
-	////	c.AbortWithStatusJSON(http.StatusOK, map[string]interface{}{
-	////		//"msg": errors.Wrap(err, "could not retrieve product").Error(),
-	////		"ok": 1,
-	////	})
-	////	return
-	////}
-	////paymentResp, err := v1.NewEmailServiceClient(conn).SendOrderConfirmation(ctx, &v1.SendOrderConfirmationRequest{
-	////	Email: "12334",
-	////})
-	////if err != nil {
-	////	fmt.Printf("could not charge the card: %+v", err)
-	////	return
-	////}
-	//fmt.Println(ctx)
-	//fmt.Println(ctx)
-	//fmt.Println(err)
 
-	//currencies, err := getCurrencies(ctx)
-	//if err != nil {
-	//	c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
-	//		"msg": errors.Wrap(err, "could not retrieve currencies"),
-	//		"ok":  1,
-	//	})
-	//	return
-	//}
-	//p, err = getProduct(ctx, id)
-	//if err != nil {
-	//	c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
-	//		"msg": errors.Wrap(err, "could not retrieve product"),
-	//		"ok":  1,
-	//	})
-	//
-	//	return
-	//}
-	//currencies, err = getCurrencies(ctx)
-	//
-	//if err != nil {
-	//	c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
-	//		"msg": errors.Wrap(err, "could not retrieve currencies"),
-	//		"ok":  1,
-	//	})
-	//	return
-	//}
-	//cart, err := getCart(ctx, sessionID(c.Request))
-	//if err != nil {
-	//	c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
-	//		"msg": errors.Wrap(err, "could not retrieve cart"),
-	//		"ok":  1,
-	//	})
-	//	return
-	//}
-	//
-	//price, err := convertCurrency(ctx, p.GetPriceUsd(), currentCurrency(c.Request))
-	//if err != nil {
-	//	c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
-	//		"msg": errors.Wrap(err, "failed to convert currency"),
-	//		"ok":  1,
-	//	})
-	//	return
-	//}
-	//
-	//recommendations, err := getRecommendations(ctx, sessionID(c.Request), []string{id})
-	//if err != nil {
-	//	c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
-	//		"msg": errors.Wrap(err, "failed to get product recommendations"),
-	//		"ok":  1,
-	//	})
-	//	return
-	//}
-	//
-	//product := struct {
-	//	Item  *v1.Product
-	//	Price *v1.Money
-	//}{p, price}
-	fmt.Println("success ? ")
-	//c.JSON(http.StatusOK, map[string]interface{}{
-	//	//"session_id":      sessionID(c.Request),
-	//	//"request_id":      c.Request.Context().Value(ctxKeyRequestID{}),
-	//	//"ad":              chooseAd(c.Request.Context(), p.Categories),
-	//	//"user_currency":   currentCurrency(c.Request),
-	//	"show_currency": true,
-	//	//"currencies":      currencies,
-	//	//"product":         product,
-	//	//"recommendations": recommendations,
-	//	//"cart_size":       cartSize(cart),
-	//})
+	p, err := getProduct(c.Request.Context(), id)
+	if err != nil {
+
+		c.AbortWithStatusJSON(http.StatusOK, map[string]interface{}{
+			"msg": errors.Wrap(err, "could not retrieve product").Error(),
+			"ok":  1,
+		})
+		return
+	}
+	currencies, err := getCurrencies(c.Request.Context())
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
+			"msg": errors.Wrap(err, "could not retrieve currencies"),
+			"ok":  1,
+		})
+		return
+	}
+	cart, err := getCart(c.Request.Context(), sessionID(c.Request))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
+			"msg": errors.Wrap(err, "could not retrieve product"),
+			"ok":  1,
+		})
+
+		return
+	}
+	price, err := convertCurrency(c.Request.Context(),p.GetPriceUsd(),currentCurrency(c.Request))
+
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
+			"msg": errors.Wrap(err, "could not retrieve currencies"),
+			"ok":  1,
+		})
+		return
+	}
+	recommendations, err := getRecommendations(c.Request.Context(), sessionID(c.Request), []string{id})
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]interface{}{
+			"msg": errors.Wrap(err, "failed to get product recommendations"),
+			"ok":  1,
+		})
+		return
+	}
+	products := struct {
+		Item  *v1.Product
+		Price *v1.Money
+	}{p, price}
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"session_id":      sessionID(c.Request),
+		"request_id":      c.Request.Context().Value(ctxKeyRequestID{}),
+		"ad":              chooseAd(c.Request.Context(), p.Categories),
+		"user_currency":   currentCurrency(c.Request),
+		"show_currency":   true,
+		"currencies":      currencies,
+		"product":         products,
+		"recommendations": recommendations,
+		"cart_size":       cartSize(cart),
+	})
 
 }
 
-func ViewCartHandler(c *gin.Context) {
+func (gs *GatewayService) ViewCartHandler(c *gin.Context) {
 	r := c.Request
 	currencies, err := getCurrencies(c.Request.Context())
 	if err != nil {
@@ -279,7 +255,7 @@ func ViewCartHandler(c *gin.Context) {
 
 }
 
-func AddToCartHandler(c *gin.Context) {
+func (gs *GatewayService) AddToCartHandler(c *gin.Context) {
 	r := c.Request
 	quantity, _ := strconv.ParseUint(r.FormValue("quantity"), 10, 32)
 	productID := r.FormValue("product_id")
@@ -313,7 +289,7 @@ func AddToCartHandler(c *gin.Context) {
 	c.JSON(http.StatusFound, nil)
 }
 
-func EmptyCartHandler(c *gin.Context) {
+func (gs *GatewayService) EmptyCartHandler(c *gin.Context) {
 	if err := emptyCart(c.Request.Context(), sessionID(c.Request)); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, map[string]interface{}{
 			"msg": errors.Wrap(err, "failed to empty cart"),
@@ -327,7 +303,7 @@ func EmptyCartHandler(c *gin.Context) {
 
 }
 
-func SetCurrencyHandler(c *gin.Context) {
+func (gs *GatewayService) SetCurrencyHandler(c *gin.Context) {
 	cur := c.Request.FormValue("currency_code")
 
 	if cur != "" {
@@ -347,7 +323,7 @@ func SetCurrencyHandler(c *gin.Context) {
 	c.JSON(http.StatusFound, nil)
 }
 
-func LogoutHandler(c *gin.Context) {
+func (gs *GatewayService) LogoutHandler(c *gin.Context) {
 	for _, cc := range c.Request.Cookies() {
 		cc.Expires = time.Now().Add(-time.Hour * 24 * 365)
 		cc.MaxAge = -1
@@ -358,7 +334,7 @@ func LogoutHandler(c *gin.Context) {
 	c.JSON(http.StatusFound, nil)
 }
 
-func PlaceOrderHandler(c *gin.Context) {
+func (gs *GatewayService) PlaceOrderHandler(c *gin.Context) {
 	r := c.Request
 	var (
 		email         = r.FormValue("email")

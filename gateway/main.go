@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"github.com/gin-contrib/cors"
@@ -11,6 +10,9 @@ import (
 	"microservices_demo/gateway/internal/server"
 	"microservices_demo/gateway/internal/service"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -36,31 +38,22 @@ func main() {
 	engine := gin.Default()
 
 	engine.Use(GinCors())
-	engine.Use(GinLogger())
 	// 1. 初始化repo
-	//gatewayService := service.NewGatewayService(logger)
-	group := engine.Group("")
-	{
-		group.GET("/product/:id", service.ProductHandler)
-		group.GET("/cart", service.ViewCartHandler)
-		group.POST("/cart", service.AddToCartHandler)
-		group.POST("/cart/empty", service.EmptyCartHandler)
-		group.POST("/setCurrency", service.SetCurrencyHandler)
-		group.GET("/logout", service.LogoutHandler)
-		group.POST("/cart/checkout", service.PlaceOrderHandler)
-	}
+	gatewayService := service.NewGatewayService(logger)
+
 
 	addr := ":8000"
-	httpServer = server.NewHTTPServer(logger, engine, addr, 5000)
+	httpServer = server.NewHTTPServer(logger, engine, addr)
 	fmt.Println("started http server" + addr)
 	if err := httpServer.ListenAndServe(); err != nil {
 		log.Fatalf("start http failed : %v", err)
 	}
-	//quit := make(chan os.Signal)
-	//signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	//<-quit
-	//fmt.Println("deregister service")
-	//stopService(httpServer)
+
+	quit := make(chan os.Signal)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	fmt.Println("deregister service")
+	stopService(httpServer)
 }
 
 func stopService(httpServer *http.Server) {
@@ -80,32 +73,4 @@ func stopService(httpServer *http.Server) {
 		log.Println("Server exiting")
 	}
 	log.Println("Server exiting")
-}
-
-// GinLogger 接收gin框架默认的日志
-func GinLogger() gin.HandlerFunc {
-	return func(c *gin.Context) {
-
-		blw := &CustomResponseWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
-		c.Writer = blw
-		c.Next()
-		fmt.Println(c.Writer.Status())
-		fmt.Println(c.Writer.Write([]byte("44234")))
-		fmt.Println(c.Writer.WriteString("4543534"))
-		fmt.Printf("url=%s, status=%d, resp=%s \n", c.Request.URL, c.Writer.Status(), blw.body.String())
-	}
-}
-type CustomResponseWriter struct {
-	gin.ResponseWriter
-	body *bytes.Buffer
-}
-
-func (w CustomResponseWriter) Write(b []byte) (int, error) {
-	w.body.Write(b)
-	return w.ResponseWriter.Write(b)
-}
-
-func (w CustomResponseWriter) WriteString(s string) (int, error) {
-	w.body.WriteString(s)
-	return w.ResponseWriter.WriteString(s)
 }

@@ -7,11 +7,11 @@ import (
 	"time"
 )
 
-func NewHTTPServer(logger *zap.Logger, handler *gin.Engine, addr string, timeout time.Duration) *http.Server {
+func NewHTTPServer(logger *zap.Logger, handler *gin.Engine, addr string) *http.Server {
 	server := &http.Server{
 		Handler:      handler,
 		Addr:         addr,
-		WriteTimeout: timeout,
+		//WriteTimeout: timeout,
 		ReadTimeout:    10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
