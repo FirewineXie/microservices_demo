@@ -29,11 +29,7 @@ func main() {
 	defer tracer.Close()
 	useCase := biz.NewCheckoutUseCase(logger)
 	productService := service.NewCheckoutService(useCase, logger)
-	pkg.ConnectNacos()
-	_, err := pkg.RegisterInstance()
-	if err != nil {
-		panic(err)
-	}
+
 	go func() {
 		addr := "0.0.0.0:" + fmt.Sprint(9003)
 		grpcServer = server.NewGRPCServer(logger, productService)

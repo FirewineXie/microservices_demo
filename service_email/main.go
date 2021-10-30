@@ -23,15 +23,17 @@ func init() {
 }
 func main() {
 	var grpcServer *grpc.Server
-	//tracer := startTracer()
-	//defer tracer.Close()
+
 	emailUseCase := biz.NewEmailUseCase(logger)
 	productService := service.NewEmailService(emailUseCase, logger)
-	//pkg.ConnectNacos()
-	//_, err := pkg.RegisterInstance()
-	//if err != nil {
-	//	panic(err)
-	//}
+	jaeger, err := jaegerc.InitGlobalTracerProd(&jaegerc.TraceConf{
+		ServerName: "service-email",
+	}, logger)
+	if err != nil {
+		panic(err)
+		return
+	}
+	defer jaeger.Close()
 	go func() {
 		addr := "0.0.0.0:" + fmt.Sprint(9005)
 		grpcServer = server.NewGRPCServer(logger, productService)

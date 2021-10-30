@@ -8,6 +8,7 @@ import (
 	"microservices_demo/service_payment/internal/biz"
 	"microservices_demo/service_payment/internal/server"
 	"microservices_demo/service_payment/internal/service"
+	"microservices_demo/third_party/jaegerc"
 	"net"
 	"os"
 	"os/signal"
@@ -24,7 +25,14 @@ func main() {
 
 	paymentUseCase := biz.NewPaymentUseCase(logger)
 	productService := service.NewPaymentService(paymentUseCase, logger)
-
+	jaeger, err := jaegerc.InitGlobalTracerProd(&jaegerc.TraceConf{
+		ServerName: "service-payment",
+	}, logger)
+	if err != nil {
+		panic(err)
+		return
+	}
+	defer jaeger.Close()
 	go func() {
 		addr := "0.0.0.0:" + fmt.Sprint(9006)
 		grpcServer = server.NewGRPCServer(logger, productService)

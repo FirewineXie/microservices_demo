@@ -42,6 +42,7 @@ func InitGlobalTracerProd(conf *TraceConf, logger *zap.Logger) (io.Closer, error
 	return cfg.InitGlobalTracer(
 		conf.ServerName,
 		jaegercfg.Logger(&jLogger),
+		//jaegercfg.Logger(&jLogger),
 		jaegercfg.Metrics(jMetricsFactory))
 
 }

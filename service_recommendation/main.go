@@ -8,6 +8,7 @@ import (
 	"microservices_demo/service_recommendation/internal/biz"
 	"microservices_demo/service_recommendation/internal/server"
 	"microservices_demo/service_recommendation/internal/service"
+	"microservices_demo/third_party/jaegerc"
 
 	"net"
 	"os"
@@ -25,7 +26,14 @@ func main() {
 
 	useCase := biz.NewRecommendationUseCase(logger)
 	productService := service.NewRecommendationService(useCase, logger)
-
+	jaeger, err := jaegerc.InitGlobalTracerProd(&jaegerc.TraceConf{
+		ServerName: "service-recommendation",
+	}, logger)
+	if err != nil {
+		panic(err)
+		return
+	}
+	defer jaeger.Close()
 	go func() {
 		addr := "0.0.0.0:" + fmt.Sprint(9008)
 		grpcServer = server.NewGRPCServer(logger, productService)

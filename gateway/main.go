@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 	"log"
 	"microservices_demo/gateway/internal/server"
 	"microservices_demo/gateway/internal/service"
+	"microservices_demo/third_party/jaegerc"
 	"net/http"
 	"os"
 	"os/signal"
@@ -32,15 +34,39 @@ func GinCors() gin.HandlerFunc {
 	})
 }
 
+func JaegerCors() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		//tracer := opentracing.GlobalTracer()
+		spanFromContext, ctx := opentracing.StartSpanFromContext(c.Request.Context(), c.Request.RequestURI)
+
+		c.Set("span", spanFromContext)
+		c.Set("ctx", ctx)
+		defer spanFromContext.Finish()
+		c.Next()
+
+	}
+}
+
 func main() {
 
 	var httpServer *http.Server
 	engine := gin.Default()
 
+	engine.Use(JaegerCors())
 	engine.Use(GinCors())
+
+	jaeger, err := jaegerc.InitGlobalTracerProd(&jaegerc.TraceConf{
+		ServerName: "gateway",
+	}, logger)
+	if err != nil {
+		panic(err)
+		return
+	}
+	defer jaeger.Close()
 	// 1. 初始化repo
 	gatewayService := service.NewGatewayService(logger)
 
+	gatewayService.Router(engine.Group("/api"))
 
 	addr := ":8000"
 	httpServer = server.NewHTTPServer(logger, engine, addr)

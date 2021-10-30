@@ -9,7 +9,6 @@ type GatewayService struct {
 }
 
 
-
 func NewGatewayService(logger *zap.Logger) *GatewayService {
 	return &GatewayService{logger}
 }

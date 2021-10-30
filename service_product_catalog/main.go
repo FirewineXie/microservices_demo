@@ -8,6 +8,7 @@ import (
 	"microservices_demo/service_product_catalog/internal/biz"
 	"microservices_demo/service_product_catalog/internal/server"
 	"microservices_demo/service_product_catalog/internal/service"
+	"microservices_demo/third_party/jaegerc"
 
 	"net"
 	"os"
@@ -22,14 +23,17 @@ func init() {
 }
 func main() {
 	var grpcServer *grpc.Server
+	jaeger, err := jaegerc.InitGlobalTracerProd(&jaegerc.TraceConf{
+		ServerName: "product_catalog",
+	}, logger)
+	if err != nil {
+		panic(err)
+		return
+	}
+	defer jaeger.Close()
 
 	useCase := biz.NewProductCatalogUseCase(logger)
 	productService := service.NewProductCatalogService(useCase, logger)
-	//pkg.ConnectNacos()
-	//_, err := pkg.RegisterInstance()
-	//if err != nil {
-	//	panic(err)
-	//}
 	go func() {
 		addr := "0.0.0.0:" + fmt.Sprint(9007)
 		grpcServer = server.NewGRPCServer(logger, productService)

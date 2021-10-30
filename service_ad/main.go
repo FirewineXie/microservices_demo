@@ -6,9 +6,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log"
-	"microservices_demo/service_ad/internal/pkg"
 	"microservices_demo/service_ad/internal/server"
 	"microservices_demo/service_ad/internal/service"
+	"microservices_demo/third_party/jaegerc"
 	"net"
 	"os"
 	"os/signal"
@@ -22,13 +22,15 @@ func init() {
 }
 func main() {
 	var grpcServer *grpc.Server
-
-	productService := service.NewAdService(logger)
-	pkg.ConnectNacos()
-	_, err := pkg.RegisterInstance()
+	jaeger, err := jaegerc.InitGlobalTracerProd(&jaegerc.TraceConf{
+		ServerName: "service-ad",
+	}, logger)
 	if err != nil {
 		panic(err)
+		return
 	}
+	defer jaeger.Close()
+	productService := service.NewAdService(logger)
 	go func() {
 		addr := "0.0.0.0:" + fmt.Sprint(9001)
 		grpcServer = server.NewGRPCServer(logger, productService)
@@ -47,7 +49,6 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	pkg.DeregisterInstance()
 	fmt.Println("deregister service")
 	grpcServer.GracefulStop()
 

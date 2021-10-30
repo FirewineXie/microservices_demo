@@ -17,7 +17,7 @@ func (l *zapLogger) Error(msg string) {
 
 // Infof logs a message at info priority
 func (l *zapLogger) Infof(msg string, args ...interface{}) {
-	l.logger.Info(msg, zap.Any("args", args))
+	l.logger.Sugar().Infof(msg, args...)
 
 }
 

@@ -8,6 +8,7 @@ import (
 	"microservices_demo/service_shipping/internal/biz"
 	"microservices_demo/service_shipping/internal/server"
 	"microservices_demo/service_shipping/internal/service"
+	"microservices_demo/third_party/jaegerc"
 
 	"net"
 	"os"
@@ -25,7 +26,14 @@ func main() {
 
 	useCase := biz.NewShippingUseCase(logger)
 	productService := service.NewShippingService(useCase, logger)
-
+	jaeger, err := jaegerc.InitGlobalTracerProd(&jaegerc.TraceConf{
+		ServerName: "service-shipping",
+	}, logger)
+	if err != nil {
+		panic(err)
+		return
+	}
+	defer jaeger.Close()
 	go func() {
 		addr := "0.0.0.0:" + fmt.Sprint(9009)
 		grpcServer = server.NewGRPCServer(logger, productService)
