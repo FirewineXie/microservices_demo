@@ -9,7 +9,7 @@ import (
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	v1 "microservices_demo/service_currency/api/v1"
+	"microservices_demo/service_currency/internal/api/v1"
 	"microservices_demo/service_currency/internal/service"
 )
 

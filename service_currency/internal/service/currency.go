@@ -3,24 +3,24 @@ package service
 import (
 	"context"
 	"math"
-	v1 "microservices_demo/service_currency/api/v1"
+	v12 "microservices_demo/service_currency/internal/api/v1"
 	"microservices_demo/service_currency/internal/biz"
 )
 
 // GetSupportedCurrencies Lists the supported currencies
-func (cs *CurrencyService) GetSupportedCurrencies(context.Context, *v1.Empty) (*v1.GetSupportedCurrenciesResponse, error) {
+func (cs *CurrencyService) GetSupportedCurrencies(context.Context, *v12.Empty) (*v12.GetSupportedCurrenciesResponse, error) {
 	cs.logger.Info("Getting supported currencies...")
 	currencyData := cs.shipping.GetCurrencyData()
 	var keys []string
-	for k,_ := range currencyData{
+	for k, _ := range currencyData {
 		keys = append(keys, k)
 	}
 
-	return &v1.GetSupportedCurrenciesResponse{
+	return &v12.GetSupportedCurrenciesResponse{
 		CurrencyCodes: keys,
-	},nil
+	}, nil
 }
-func (cs *CurrencyService) Convert(c context.Context,request *v1.CurrencyConversionRequest) (*v1.Money, error) {
+func (cs *CurrencyService) Convert(c context.Context, request *v12.CurrencyConversionRequest) (*v12.Money, error) {
 	cs.logger.Info("received conversion request")
 
 	from := request.From
@@ -43,7 +43,7 @@ func (cs *CurrencyService) Convert(c context.Context,request *v1.CurrencyConvers
 	result.Nanos = int32(math.Floor(float64(result.Nanos)))
 	result.CurrencyCode = request.ToCode
 
-	return &v1.Money{
+	return &v12.Money{
 		Units:        result.Units,
 		Nanos:        result.Nanos,
 		CurrencyCode: result.CurrencyCode,

@@ -2,9 +2,8 @@ package service
 
 import (
 	"go.uber.org/zap"
-	v1 "microservices_demo/service_currency/api/v1"
+	"microservices_demo/service_currency/internal/api/v1"
 	"microservices_demo/service_currency/internal/biz"
-
 )
 
 type CurrencyService struct {
