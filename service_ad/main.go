@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -10,6 +12,7 @@ import (
 	"microservices_demo/service_ad/internal/service"
 	"microservices_demo/third_party/jaegerc"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -38,8 +41,11 @@ func main() {
 		if err != nil {
 			log.Fatalf("port is used : %v", err)
 		}
-		fmt.Println("started grpc server" + addr)
+		fmt.Println("started grpc server " + addr)
 		reflection.Register(grpcServer)
+		grpc_prometheus.Register(grpcServer)
+		// Register Prometheus metrics handler.
+		http.Handle("/metrics", promhttp.Handler())
 		if err := grpcServer.Serve(lis); err != nil {
 			log.Fatalf("start grpc failed :%v", err)
 		}

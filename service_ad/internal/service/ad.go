@@ -2,13 +2,13 @@ package service
 
 import (
 	"context"
-	v1 "microservices_demo/service_ad/api/v1"
+	v1 "microservices_demo/service_ad/internal/api/v1"
+
 	"microservices_demo/service_ad/internal/biz"
 )
 
 func (s *AdService) GetAds(ctx context.Context,
 	req *v1.AdRequest) (resp *v1.AdResponse, err error) {
-
 
 	resp = new(v1.AdResponse)
 
