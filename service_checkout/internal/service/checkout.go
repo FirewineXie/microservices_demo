@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
-	v1 "microservices_demo/service_checkout/api/v1"
+	v12 "microservices_demo/service_checkout/internal/api/v1"
 )
 
-func (cs  *CheckoutService) PlaceOrder(ctx context.Context,request *v1.PlaceOrderRequest) (resp *v1.PlaceOrderResponse,err error) {
+func (cs *CheckoutService) PlaceOrder(ctx context.Context, request *v12.PlaceOrderRequest) (resp *v12.PlaceOrderResponse, err error) {
 
 	orderID, err := uuid.NewUUID()
 	//
@@ -51,11 +51,11 @@ func (cs  *CheckoutService) PlaceOrder(ctx context.Context,request *v1.PlaceOrde
 	//
 	//_ = emptyUserCart(ctx, request.UserId)
 	//
-	orderResult := &v1.OrderResult{
-		OrderId:            orderID.String(),
+	orderResult := &v12.OrderResult{
+		OrderId: orderID.String(),
 		//ShippingTrackingId: shippingTrackingID,
 		//ShippingCost:       prep.shippingCostLocalized,
-		ShippingAddress:    request.Address,
+		ShippingAddress: request.Address,
 		//Items:              prep.orderItems,
 	}
 
@@ -64,18 +64,17 @@ func (cs  *CheckoutService) PlaceOrder(ctx context.Context,request *v1.PlaceOrde
 	} else {
 		cs.logger.Info("order confirmation email sent to", zap.String("email", request.Email))
 	}
-	resp = &v1.PlaceOrderResponse{Order: orderResult}
+	resp = &v12.PlaceOrderResponse{Order: orderResult}
 	return resp, nil
 }
 
-
 type orderPrep struct {
-	orderItems            []*v1.OrderItem
-	cartItems             []*v1.CartItem
-	shippingCostLocalized *v1.Money
+	orderItems            []*v12.OrderItem
+	cartItems             []*v12.CartItem
+	shippingCostLocalized *v12.Money
 }
 
-func (s *CheckoutService) prepareOrderItemsAndShippingQuoteFromCart(ctx context.Context, userID, userCurrency string, address *v1.Address) (
+func (s *CheckoutService) prepareOrderItemsAndShippingQuoteFromCart(ctx context.Context, userID, userCurrency string, address *v12.Address) (
 	orderPrep, error) {
 	var out orderPrep
 	cartItems, err := getUserCart(ctx, userID)

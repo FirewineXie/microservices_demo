@@ -7,7 +7,6 @@ import (
 	"google.golang.org/grpc/reflection"
 	"io"
 	"microservices_demo/service_checkout/internal/biz"
-	"microservices_demo/service_checkout/internal/pkg"
 	"microservices_demo/service_checkout/internal/server"
 	"microservices_demo/service_checkout/internal/service"
 	"microservices_demo/third_party/jaegerc"
@@ -50,7 +49,7 @@ func main() {
 	quit := make(chan os.Signal)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	pkg.DeregisterInstance()
+
 	fmt.Println("deregister service")
 	grpcServer.GracefulStop()
 }

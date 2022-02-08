@@ -6,10 +6,10 @@ import (
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
-	v1 "microservices_demo/service_checkout/api/v1"
+	v12 "microservices_demo/service_checkout/internal/api/v1"
 )
 
-func getUserCart(ctx context.Context, userID string) ([]*v1.CartItem, error) {
+func getUserCart(ctx context.Context, userID string) ([]*v12.CartItem, error) {
 
 	conn, err := grpc.DialContext(ctx,
 		"0.0.0.0:9002", grpc.WithInsecure(),
@@ -18,15 +18,14 @@ func getUserCart(ctx context.Context, userID string) ([]*v1.CartItem, error) {
 		return nil, err
 	}
 	defer conn.Close()
-	resp, err := v1.NewCartServiceClient(conn).GetCart(ctx, &v1.GetCartRequest{UserId: userID})
+	resp, err := v12.NewCartServiceClient(conn).GetCart(ctx, &v12.GetCartRequest{UserId: userID})
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user cart during checkout: %+v", err)
 	}
 	return resp.GetItems(), nil
 }
 
-func quoteShipping(ctx context.Context, address *v1.Address, items []*v1.CartItem) (*v1.Money, error) {
-	
+func quoteShipping(ctx context.Context, address *v12.Address, items []*v12.CartItem) (*v12.Money, error) {
 
 	opentracing.GlobalTracer()
 	conn, err := grpc.DialContext(ctx,
@@ -37,8 +36,8 @@ func quoteShipping(ctx context.Context, address *v1.Address, items []*v1.CartIte
 	}
 	defer conn.Close()
 
-	shippingQuote, err := v1.NewShippingServiceClient(conn).
-		GetQuote(ctx, &v1.GetQuoteRequest{
+	shippingQuote, err := v12.NewShippingServiceClient(conn).
+		GetQuote(ctx, &v12.GetQuoteRequest{
 			Address: address,
 			Items:   items})
 	if err != nil {
@@ -47,9 +46,9 @@ func quoteShipping(ctx context.Context, address *v1.Address, items []*v1.CartIte
 	return shippingQuote.GetCostUsd(), nil
 }
 
-func prepOrderItems(ctx context.Context, items []*v1.CartItem, userCurrency string) ([]*v1.OrderItem, error) {
-	out := make([]*v1.OrderItem, len(items))
-	
+func prepOrderItems(ctx context.Context, items []*v12.CartItem, userCurrency string) ([]*v12.OrderItem, error) {
+	out := make([]*v12.OrderItem, len(items))
+
 	opentracing.GlobalTracer()
 	conn, err := grpc.DialContext(ctx,
 		"0.0.0.0:9007", grpc.WithInsecure(),
@@ -58,10 +57,10 @@ func prepOrderItems(ctx context.Context, items []*v1.CartItem, userCurrency stri
 		return nil, err
 	}
 	defer conn.Close()
-	cl := v1.NewProductCatalogServiceClient(conn)
+	cl := v12.NewProductCatalogServiceClient(conn)
 
 	for i, item := range items {
-		product, err := cl.GetProduct(ctx, &v1.GetProductRequest{Id: item.GetProductId()})
+		product, err := cl.GetProduct(ctx, &v12.GetProductRequest{Id: item.GetProductId()})
 		if err != nil {
 			return nil, fmt.Errorf("failed to get product #%q", item.GetProductId())
 		}
@@ -69,13 +68,13 @@ func prepOrderItems(ctx context.Context, items []*v1.CartItem, userCurrency stri
 		if err != nil {
 			return nil, fmt.Errorf("failed to convert price of %q to %s", item.GetProductId(), userCurrency)
 		}
-		out[i] = &v1.OrderItem{
+		out[i] = &v12.OrderItem{
 			Item: item,
 			Cost: price}
 	}
 	return out, nil
 }
-func convertCurrency(ctx context.Context, from *v1.Money, toCurrency string) (*v1.Money, error) {
+func convertCurrency(ctx context.Context, from *v12.Money, toCurrency string) (*v12.Money, error) {
 
 	opentracing.GlobalTracer()
 	conn, err := grpc.DialContext(ctx,
@@ -85,7 +84,7 @@ func convertCurrency(ctx context.Context, from *v1.Money, toCurrency string) (*v
 		return nil, err
 	}
 	defer conn.Close()
-	result, err := v1.NewCurrencyServiceClient(conn).Convert(context.TODO(), &v1.CurrencyConversionRequest{
+	result, err := v12.NewCurrencyServiceClient(conn).Convert(context.TODO(), &v12.CurrencyConversionRequest{
 		From:   from,
 		ToCode: toCurrency})
 	if err != nil {
@@ -94,8 +93,7 @@ func convertCurrency(ctx context.Context, from *v1.Money, toCurrency string) (*v
 	return result, err
 }
 
-func chargeCard(ctx context.Context, amount *v1.Money, paymentInfo *v1.CreditCardInfo) (string, error) {
-
+func chargeCard(ctx context.Context, amount *v12.Money, paymentInfo *v12.CreditCardInfo) (string, error) {
 
 	opentracing.GlobalTracer()
 	conn, err := grpc.DialContext(ctx,
@@ -105,7 +103,7 @@ func chargeCard(ctx context.Context, amount *v1.Money, paymentInfo *v1.CreditCar
 		return "", err
 	}
 	defer conn.Close()
-	paymentResp, err := v1.NewPaymentServiceClient(conn).Charge(ctx, &v1.ChargeRequest{
+	paymentResp, err := v12.NewPaymentServiceClient(conn).Charge(ctx, &v12.ChargeRequest{
 		Amount:     amount,
 		CreditCard: paymentInfo})
 	if err != nil {
@@ -114,7 +112,7 @@ func chargeCard(ctx context.Context, amount *v1.Money, paymentInfo *v1.CreditCar
 	return paymentResp.GetTransactionId(), nil
 }
 
-func sendOrderConfirmation(ctx context.Context, email string, order *v1.OrderResult) error {
+func sendOrderConfirmation(ctx context.Context, email string, order *v12.OrderResult) error {
 
 	opentracing.GlobalTracer()
 	conn, err := grpc.DialContext(ctx,
@@ -124,13 +122,13 @@ func sendOrderConfirmation(ctx context.Context, email string, order *v1.OrderRes
 		return err
 	}
 	defer conn.Close()
-	_, err = v1.NewEmailServiceClient(conn).SendOrderConfirmation(ctx, &v1.SendOrderConfirmationRequest{
+	_, err = v12.NewEmailServiceClient(conn).SendOrderConfirmation(ctx, &v12.SendOrderConfirmationRequest{
 		Email: email,
 		Order: order})
 	return err
 }
 
-func shipOrder(ctx context.Context, address *v1.Address, items []*v1.CartItem) (string, error) {
+func shipOrder(ctx context.Context, address *v12.Address, items []*v12.CartItem) (string, error) {
 
 	opentracing.GlobalTracer()
 	conn, err := grpc.DialContext(ctx,
@@ -140,7 +138,7 @@ func shipOrder(ctx context.Context, address *v1.Address, items []*v1.CartItem) (
 		return "", err
 	}
 	defer conn.Close()
-	resp, err := v1.NewShippingServiceClient(conn).ShipOrder(ctx, &v1.ShipOrderRequest{
+	resp, err := v12.NewShippingServiceClient(conn).ShipOrder(ctx, &v12.ShipOrderRequest{
 		Address: address,
 		Items:   items})
 	if err != nil {
@@ -160,7 +158,7 @@ func emptyUserCart(ctx context.Context, userID string) error {
 	}
 	defer conn.Close()
 
-	if _, err = v1.NewCartServiceClient(conn).EmptyCart(ctx, &v1.EmptyCartRequest{UserId: userID}); err != nil {
+	if _, err = v12.NewCartServiceClient(conn).EmptyCart(ctx, &v12.EmptyCartRequest{UserId: userID}); err != nil {
 		return fmt.Errorf("failed to empty user cart during checkout: %+v", err)
 	}
 	return nil
