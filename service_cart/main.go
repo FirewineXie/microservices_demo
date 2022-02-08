@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -10,6 +12,7 @@ import (
 	"microservices_demo/service_cart/internal/service"
 	"microservices_demo/third_party/jaegerc"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -20,7 +23,6 @@ var logger *zap.Logger
 func init() {
 	logger = zap.NewExample()
 }
-
 
 func main() {
 	var grpcServer *grpc.Server
@@ -44,6 +46,8 @@ func main() {
 		}
 		fmt.Println("started grpc server" + addr)
 		reflection.Register(grpcServer)
+		grpc_prometheus.Register(grpcServer)
+		http.Handle("/metrics", promhttp.Handler())
 		if err := grpcServer.Serve(lis); err != nil {
 			logger.Error("start grpc failed :%v", zap.Error(err))
 			return

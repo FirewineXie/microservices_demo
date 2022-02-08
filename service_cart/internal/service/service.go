@@ -2,7 +2,7 @@ package service
 
 import (
 	"go.uber.org/zap"
-	v1 "microservices_demo/service_cart/api/v1"
+	"microservices_demo/service_cart/internal/api/v1"
 	"microservices_demo/service_cart/internal/biz"
 )
 
@@ -12,9 +12,9 @@ type CartService struct {
 	logger *zap.Logger
 }
 
-func NewCartService(cart *biz.CartUseCase,logger *zap.Logger) *CartService{
+func NewCartService(cart *biz.CartUseCase, logger *zap.Logger) *CartService {
 	return &CartService{
-		cart: cart,
+		cart:   cart,
 		logger: logger,
 	}
 }

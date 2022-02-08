@@ -18,7 +18,7 @@ type CartUseCase struct {
 
 func (c CartUseCase) AddItem(ctx context.Context, c2 *Cart, userId string) error {
 	c.logger.Info("AddItem called with ", zap.String("user_id", userId), zap.String("product_id", c2.ProductId), zap.Int32("quantity", c2.Quantity))
-
+	userCartItems[userId] = append(userCartItems[userId], c2)
 	return nil
 }
 
