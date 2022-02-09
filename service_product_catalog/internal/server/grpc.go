@@ -9,9 +9,8 @@ import (
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	v1 "microservices_demo/service_product_catalog/api/v1"
+	"microservices_demo/service_product_catalog/internal/api/v1"
 	service2 "microservices_demo/service_product_catalog/internal/service"
-
 )
 
 // NewGRPCServer new a gRPC server.
@@ -26,6 +25,6 @@ func NewGRPCServer(logger *zap.Logger, server *service2.ProductCatalogService) *
 			grpc_opentracing.UnaryServerInterceptor(),
 		)))
 
-	v1.RegisterProductCatalogServiceServer(srv,server)
+	v1.RegisterProductCatalogServiceServer(srv, server)
 	return srv
 }

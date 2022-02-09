@@ -2,9 +2,8 @@ package service
 
 import (
 	"go.uber.org/zap"
-	v1 "microservices_demo/service_product_catalog/api/v1"
+	"microservices_demo/service_product_catalog/internal/api/v1"
 	"microservices_demo/service_product_catalog/internal/biz"
-
 )
 
 type ProductCatalogService struct {

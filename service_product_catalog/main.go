@@ -24,7 +24,7 @@ func init() {
 func main() {
 	var grpcServer *grpc.Server
 	jaeger, err := jaegerc.InitGlobalTracerProd(&jaegerc.TraceConf{
-		ServerName: "product_catalog",
+		ServerName: "service_product_catalog",
 	}, logger)
 	if err != nil {
 		panic(err)
