@@ -13,7 +13,7 @@ import (
 func TestGRPC(t *testing.T) {
 	ctx := context.Background()
 	conn, err := grpc.DialContext(ctx,
-		"0.0.0.0:9001", grpc.WithInsecure(),
+		"0.0.0.0:9005", grpc.WithInsecure(),
 		grpc.WithUnaryInterceptor(grpc_opentracing.UnaryClientInterceptor()))
 	paymentResp, err := v1.NewEmailServiceClient(conn).SendOrderConfirmation(ctx, &v1.SendOrderConfirmationRequest{
 		Email: "12334",
