@@ -4,13 +4,15 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"microservices_demo/service_payment/internal/api/v1"
 	"strconv"
 	"time"
-
-	v1 "microservices_demo/service_payment/api/v1"
 )
 
 func (ps *PaymentService) Charge(ctx context.Context, request *v1.ChargeRequest) (*v1.ChargeResponse, error) {
+	resp := &v1.ChargeResponse{}
 	amount := request.GetAmount()
 	creditCard := request.GetCreditCard()
 
@@ -18,11 +20,12 @@ func (ps *PaymentService) Charge(ctx context.Context, request *v1.ChargeRequest)
 	cardType, valid := ps.payment.CardValidator(cardNumber)
 
 	if !valid {
-		return nil, errors.New("invalid credit card")
+		return resp, status.Errorf(codes.InvalidArgument, "invalid credit card")
+
 	}
 
 	if !(cardType == "visa" || cardType == "mastercard") {
-		return nil, errors.Errorf("Sorry, we cannot process %v credit cards. Only VISA or MasterCard is accepted.", cardType)
+		return resp, errors.Errorf("Sorry, we cannot process %v credit cards. Only VISA or MasterCard is accepted.", cardType)
 	}
 	currentMonth, _ := strconv.Atoi(time.Now().Format("01"))
 
@@ -32,7 +35,7 @@ func (ps *PaymentService) Charge(ctx context.Context, request *v1.ChargeRequest)
 	month := creditCard.GetCreditCardExpirationMonth()
 
 	if ((currentYear * 12) + currentMonth) > int(year*12+month) {
-		return nil, errors.Errorf("Your credit card (ending %v) expired on %d/%d", cardNumber, month, year)
+		return resp, errors.Errorf("Your credit card (ending %v) expired on %d/%d", cardNumber, month, year)
 	}
 
 	ps.logger.Sugar().Infof("Transaction processed :%v ending %v Amount: %v%d.%d", cardType, cardNumber, amount.CurrencyCode, amount.Units, amount.Nanos)

@@ -2,19 +2,19 @@ package service
 
 import (
 	"go.uber.org/zap"
-	v1 "microservices_demo/service_payment/api/v1"
+	"microservices_demo/service_payment/internal/api/v1"
 	"microservices_demo/service_payment/internal/biz"
 )
 
 type PaymentService struct {
 	v1.UnimplementedPaymentServiceServer
-	payment  *biz.PaymentUseCase
-	logger *zap.Logger
+	payment *biz.PaymentUseCase
+	logger  *zap.Logger
 }
 
 func NewPaymentService(payment *biz.PaymentUseCase, logger *zap.Logger) *PaymentService {
 	return &PaymentService{
-		payment:  payment,
-		logger: logger.Named("service_payment"),
+		payment: payment,
+		logger:  logger.Named("service_payment"),
 	}
 }

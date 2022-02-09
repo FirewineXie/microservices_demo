@@ -5,7 +5,7 @@ import (
 	"fmt"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
 	"google.golang.org/grpc"
-	v1 "microservices_demo/service_payment/api/v1"
+	v12 "microservices_demo/service_payment/internal/api/v1"
 
 	"testing"
 )
@@ -13,10 +13,10 @@ import (
 func TestGRPC(t *testing.T) {
 	ctx := context.Background()
 	conn, err := grpc.DialContext(ctx,
-		"0.0.0.0:9002", grpc.WithInsecure(),
+		"0.0.0.0:9006", grpc.WithInsecure(),
 		grpc.WithUnaryInterceptor(grpc_opentracing.UnaryClientInterceptor()))
-	paymentResp, err := v1.NewPaymentServiceClient(conn).Charge(ctx, &v1.ChargeRequest{
-		Amount: &v1.Money{
+	paymentResp, err := v12.NewPaymentServiceClient(conn).Charge(ctx, &v12.ChargeRequest{
+		Amount: &v12.Money{
 			CurrencyCode: "11",
 			Units:        222,
 			Nanos:        33,

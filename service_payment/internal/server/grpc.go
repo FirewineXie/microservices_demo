@@ -9,7 +9,7 @@ import (
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	v1 "microservices_demo/service_payment/api/v1"
+	"microservices_demo/service_payment/internal/api/v1"
 	"microservices_demo/service_payment/internal/service"
 )
 
@@ -25,6 +25,6 @@ func NewGRPCServer(logger *zap.Logger, server *service.PaymentService) *grpc.Ser
 			grpc_opentracing.UnaryServerInterceptor(),
 		)))
 
-	v1.RegisterPaymentServiceServer(srv,server)
+	v1.RegisterPaymentServiceServer(srv, server)
 	return srv
 }
