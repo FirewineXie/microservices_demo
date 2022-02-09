@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+import "proto/demo_base.proto";
+
+package hipstershop.v1;
+option go_package = "protobuf;v1";
+
+
+// -------------Payment service-----------------
+
+service PaymentService {
+  rpc Charge (ChargeRequest) returns (ChargeResponse);
+}
+
+
+
+message ChargeRequest {
+  v1.Money amount = 1;
+  CreditCardInfo credit_card = 2;
+}
+
+
+message ChargeResponse {
+  string transaction_id = 1;
+}

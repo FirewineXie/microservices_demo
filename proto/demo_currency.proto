@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+
+package hipstershop.v1;
+
+import "proto/demo_base.proto";
+
+option go_package = "protobuf;v1";
+option java_package = "com.study.histershop";
+option java_multiple_files = true ;
+
+// -----------------Currency service-----------------
+
+service CurrencyService {
+    rpc GetSupportedCurrencies(Empty) returns (GetSupportedCurrenciesResponse);
+    rpc Convert(CurrencyConversionRequest) returns (v1.Money);
+}
+
+
+
+
+message  CurrencyConversionRequest {
+    Money from = 1;
+    // the 3-letter currency ode defined in ISO 4217
+    string to_code = 2;
+}
+
+message GetSupportedCurrenciesResponse {
+    repeated  string currency_codes = 1;
+}

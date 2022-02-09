@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+
+import "proto/demo_base.proto";
+
+
+package hipstershop.v1;
+option go_package = "protobuf;v1";
+
+
+// ---------------Product Catalog----------------
+
+
+service ProductCatalogService {
+  rpc ListProducts(Empty) returns (ListProductsResponse);
+  rpc GetProduct(GetProductRequest) returns (Product);
+  rpc SearchProducts(SearchProductsRequest) returns (SearchProductsResponse);
+}
+
+message Product {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string picture = 4;
+  v1.Money price_usd = 5;
+  // Categories such as "vintage" or "gardening" that can be used to look up
+  // other related products.
+  repeated  string categories = 6;
+}
+
+message ListProductsResponse {
+  repeated  Product products = 1;
+}
+
+
+message GetProductRequest {
+  string id = 1;
+}
+
+message SearchProductsRequest {
+  string query = 1;
+}
+
+message SearchProductsResponse {
+  repeated Product results = 1;
+}
+
+
+
+

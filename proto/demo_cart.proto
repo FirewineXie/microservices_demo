@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package hipstershop.v1;
+
+option go_package = "protobuf;v1";
+
+import "proto/demo_base.proto";
+
+
+
+// -----------------Cart service-----------------
+
+service CartService {
+    rpc AddItem(AddItemRequest) returns (v1.Empty);
+    rpc GetCart(GetCartRequest) returns (Cart);
+    rpc EmptyCart(EmptyCartRequest) returns (v1.Empty);
+
+}
+
+message AddItemRequest {
+    string user_id = 1;
+    CartItem item = 2;
+}
+
+message EmptyCartRequest {
+    string user_id = 1;
+}
+
+message Cart {
+    string user_id = 1;
+    repeated CartItem  items = 2;
+}
+
+message GetCartRequest {
+    string user_id = 1;
+}
+

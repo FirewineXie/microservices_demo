@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+
+import "proto/demo_base.proto";
+
+
+package hipstershop.v1;
+option go_package = "protobuf;v1";
+
+
+service EmailService {
+  rpc SendOrderConfirmation(SendOrderConfirmationRequest) returns (Empty);
+}
+
+
+
+message SendOrderConfirmationRequest {
+  string email = 1;
+  OrderResult order = 2;
+}
+
+

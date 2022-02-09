@@ -2,7 +2,7 @@ package service
 
 import (
 	"go.uber.org/zap"
-	"microservices_demo/service_recommendation/internal/api/v1"
+	v1 "microservices_demo/service_recommendation/api/v1"
 	"microservices_demo/service_recommendation/internal/biz"
 )
 

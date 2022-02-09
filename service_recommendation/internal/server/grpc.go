@@ -9,8 +9,9 @@ import (
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
-	"microservices_demo/service_recommendation/internal/api/v1"
+	v1 "microservices_demo/service_recommendation/api/v1"
 	service2 "microservices_demo/service_recommendation/internal/service"
+
 )
 
 // NewGRPCServer new a gRPC server.
@@ -25,6 +26,6 @@ func NewGRPCServer(logger *zap.Logger, server *service2.RecommendationService) *
 			grpc_opentracing.UnaryServerInterceptor(),
 		)))
 
-	v1.RegisterRecommendationServiceServer(srv, server)
+	v1.RegisterRecommendationServiceServer(srv,server)
 	return srv
 }
