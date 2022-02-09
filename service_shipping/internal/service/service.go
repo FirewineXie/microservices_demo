@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/prometheus/common/log"
-	v1 "microservices_demo/service_shipping/api/v1"
+	v12 "microservices_demo/service_shipping/internal/api/v1"
 )
 
-func (ss *ShippingService) GetQuote(c context.Context, request *v1.GetQuoteRequest) (*v1.GetQuoteResponse, error) {
+func (ss *ShippingService) GetQuote(c context.Context, request *v12.GetQuoteRequest) (*v12.GetQuoteResponse, error) {
 
 	ss.logger.Info("[GetQuote] received request")
 	defer ss.logger.Info("[GetQuote completed request")
@@ -19,15 +19,15 @@ func (ss *ShippingService) GetQuote(c context.Context, request *v1.GetQuoteReque
 
 	quote := ss.shipping.CreateQuoteFromCount(count)
 
-	return &v1.GetQuoteResponse{
-		CostUsd: &v1.Money{
+	return &v12.GetQuoteResponse{
+		CostUsd: &v12.Money{
 			CurrencyCode: "USD",
 			Units:        int64(quote.Dollars),
 			Nanos:        int32(quote.Cents * 10000000)},
 	}, nil
 
 }
-func (ss *ShippingService) ShipOrder(c context.Context, request *v1.ShipOrderRequest) (*v1.ShipOrderResponse, error) {
+func (ss *ShippingService) ShipOrder(c context.Context, request *v12.ShipOrderRequest) (*v12.ShipOrderResponse, error) {
 	log.Info("[ShipOrder] received request")
 	defer log.Info("[ShipOrder] completed request")
 	// 1. Create a Tracking ID
@@ -35,7 +35,7 @@ func (ss *ShippingService) ShipOrder(c context.Context, request *v1.ShipOrderReq
 	id := ss.shipping.CreateTrackingId(baseAddress)
 
 	// 2. Generate a response.
-	return &v1.ShipOrderResponse{
+	return &v12.ShipOrderResponse{
 		TrackingId: id,
 	}, nil
 }
