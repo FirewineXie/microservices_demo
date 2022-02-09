@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	v1 "microservices_demo/service_recommendation/api/v1"
+	"microservices_demo/service_recommendation/internal/api/v1"
 )
 
 func (rs *RecommendationService) ListRecommendations(c context.Context, request *v1.ListRecommendationsRequest) (
@@ -34,5 +34,5 @@ func (rs *RecommendationService) ListRecommendations(c context.Context, request 
 	response := v1.ListRecommendationsResponse{}
 	response.ProductIds = append(response.ProductIds, filteredProducts...)
 
-	return &response,nil
+	return &response, nil
 }
