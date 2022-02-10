@@ -6,6 +6,8 @@
 *.so
 *.dylib
 .idea
+third_party
+core
 protobuf
 log
 # Test binary, built with `go test -c`
